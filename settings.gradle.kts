@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "short-goals"
 
 include(":core")
+include(":app")
