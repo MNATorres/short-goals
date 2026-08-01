@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,31 +52,121 @@ fun TodayScreen() {
     val app = LocalContext.current.applicationContext as ShortGoalsApp
     val viewModel: TodayViewModel = viewModel { TodayViewModel(app.repository) }
     val state by viewModel.uiState.collectAsState()
-    TodayContent(state, onToggle = viewModel::toggle)
+    TodayContent(
+        state = state,
+        onToggle = viewModel::toggle,
+        onClose = viewModel::closeDay,
+        onReopen = viewModel::reopenDay,
+    )
 }
 
 @Composable
-private fun TodayContent(state: TodayUiState, onToggle: (TodayItem) -> Unit) {
+private fun TodayContent(
+    state: TodayUiState,
+    onToggle: (TodayItem) -> Unit,
+    onClose: () -> Unit,
+    onReopen: () -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         DayHeader(state)
         Spacer(Modifier.height(16.dp))
         if (!state.hasGoals) {
             EmptyMonth(Modifier.weight(1f))
         } else {
-            DayStats(state)
+            DayBody(state, onToggle)
             Spacer(Modifier.height(12.dp))
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(state.items, key = { it.goal.id }) { item ->
-                    GoalRow(item, editable = state.close == null, onToggle = { onToggle(item) })
-                }
-                if (state.resting.isNotEmpty()) {
-                    item { RestingCard(state.resting) }
-                }
+            if (state.close == null) {
+                CloseDayButton(state, onClose)
+            } else {
+                ReopenButton(onReopen)
             }
         }
+    }
+}
+
+@Composable
+private fun ColumnScope.DayBody(state: TodayUiState, onToggle: (TodayItem) -> Unit) {
+    SealBanner(state)
+    DayStats(state)
+    Spacer(Modifier.height(12.dp))
+    LazyColumn(
+        modifier = Modifier.weight(1f),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(state.items, key = { it.goal.id }) { item ->
+            GoalRow(item, editable = state.close == null, onToggle = { onToggle(item) })
+        }
+        if (state.resting.isNotEmpty()) {
+            item { RestingCard(state.resting) }
+        }
+    }
+}
+
+@Composable
+private fun SealBanner(state: TodayUiState) {
+    val close = state.close
+    when {
+        close != null -> Banner(
+            tag = "CERRADO",
+            tagColor = Amber,
+            text = "Cerraste este día ${close.closedAt.closedAtLabel()}",
+        )
+        !state.isToday -> Banner(
+            tag = "SIN CERRAR",
+            tagColor = TextMuted,
+            text = "Marcá lo que cumpliste y cerralo cuando quieras",
+        )
+        else -> return
+    }
+    Spacer(Modifier.height(12.dp))
+}
+
+@Composable
+private fun Banner(tag: String, tagColor: Color, text: String) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, PanelBorder),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+        ) {
+            Text(
+                text = tag,
+                style = DataSmall,
+                color = tagColor,
+                modifier = Modifier
+                    .border(1.dp, tagColor, RoundedCornerShape(4.dp))
+                    .padding(horizontal = 6.dp, vertical = 2.dp),
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(text = text, style = MaterialTheme.typography.bodySmall, color = TextMuted)
+        }
+    }
+}
+
+@Composable
+private fun CloseDayButton(state: TodayUiState, onClose: () -> Unit) {
+    Button(
+        onClick = onClose,
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Amber, contentColor = OnAmber),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(if (state.isToday) "Cerrar el día" else "Cerrar este día")
+    }
+}
+
+@Composable
+private fun ReopenButton(onReopen: () -> Unit) {
+    OutlinedButton(
+        onClick = onReopen,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text("Reabrir para editar", color = MaterialTheme.colorScheme.onSurface)
     }
 }
 

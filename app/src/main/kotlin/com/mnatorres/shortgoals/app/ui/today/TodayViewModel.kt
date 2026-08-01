@@ -10,6 +10,7 @@ import com.mnatorres.shortgoals.core.currentStreak
 import com.mnatorres.shortgoals.core.restingOn
 import com.mnatorres.shortgoals.core.scheduledOn
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -91,6 +92,18 @@ class TodayViewModel(
         viewModelScope.launch {
             repository.setCheck(item.goal.id, state.date, !item.done)
         }
+    }
+
+    /** Seals the shown date. Unmarked goals stay as not done; metrics don't change. */
+    fun closeDay() {
+        val date = uiState.value.date
+        viewModelScope.launch { repository.closeDay(date, LocalDateTime.now()) }
+    }
+
+    /** Lifts the seal so the day can be corrected, to be closed again. */
+    fun reopenDay() {
+        val date = uiState.value.date
+        viewModelScope.launch { repository.reopenDay(date) }
     }
 
     private companion object {
