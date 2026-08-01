@@ -3,10 +3,6 @@ package com.mnatorres.shortgoals.app.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -21,14 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
-
-enum class Tab(val label: String, val icon: ImageVector) {
-    Today("Hoy", Icons.Filled.CheckCircle),
-    Goals("Objetivos", Icons.AutoMirrored.Filled.List),
-    Progress("Progreso", Icons.Filled.DateRange),
-}
 
 @Composable
 fun AppShell() {
