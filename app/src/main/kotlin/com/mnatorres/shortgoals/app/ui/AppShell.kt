@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
+import com.mnatorres.shortgoals.app.ui.today.TodayScreen
 
 @Composable
 fun AppShell() {
@@ -45,24 +46,22 @@ fun AppShell() {
             }
         },
     ) { padding ->
-        Box(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentAlignment = Alignment.Center,
-        ) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (selected) {
-                Tab.Today -> PlaceholderScreen("Hoy")
-                Tab.Goals -> PlaceholderScreen("Objetivos")
-                Tab.Progress -> PlaceholderScreen("Progreso")
+                Tab.Today -> TodayScreen()
+                Tab.Goals -> PlaceholderScreen("Objetivos", Modifier.align(Alignment.Center))
+                Tab.Progress -> PlaceholderScreen("Progreso", Modifier.align(Alignment.Center))
             }
         }
     }
 }
 
 @Composable
-private fun PlaceholderScreen(title: String) {
+private fun PlaceholderScreen(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         style = MaterialTheme.typography.headlineSmall,
         color = MaterialTheme.colorScheme.onBackground,
+        modifier = modifier,
     )
 }
