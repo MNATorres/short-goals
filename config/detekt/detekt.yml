@@ -1,0 +1,17 @@
+# Overrides on top of detekt's default ruleset (buildUponDefaultConfig).
+
+style:
+  MagicNumber:
+    # Colors, spacing and date literals are the app's vocabulary; naming
+    # every one would hurt more than help.
+    active: false
+
+naming:
+  FunctionNaming:
+    # Composables are PascalCase by convention.
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  LongParameterList:
+    # Compose APIs pass many defaulted parameters by design.
+    ignoreAnnotated: ['Composable']
