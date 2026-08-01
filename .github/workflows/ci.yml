@@ -20,3 +20,9 @@ jobs:
       # Builds every module: compiles, runs unit tests and assembles the app.
       # GitHub's ubuntu runners ship with the Android SDK preinstalled.
       - run: ./gradlew build
+
+      # The installable debug APK, downloadable from each run's Artifacts.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: short-goals-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
