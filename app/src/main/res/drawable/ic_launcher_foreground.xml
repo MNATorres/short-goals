@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Launcher foreground: the Tablero heatmap motif. Four rounded cells in
+    amber of growing intensity, reading toward the fully-kept day. Drawn
+    inside the 66dp adaptive-icon safe zone of the 108dp canvas.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- top-left, faintest -->
+    <path
+        android:fillColor="#40F2B441"
+        android:pathData="M38,33 h8 a5,5 0 0 1 5,5 v8 a5,5 0 0 1 -5,5 h-8 a5,5 0 0 1 -5,-5 v-8 a5,5 0 0 1 5,-5 z" />
+
+    <!-- top-right -->
+    <path
+        android:fillColor="#80F2B441"
+        android:pathData="M62,33 h8 a5,5 0 0 1 5,5 v8 a5,5 0 0 1 -5,5 h-8 a5,5 0 0 1 -5,-5 v-8 a5,5 0 0 1 5,-5 z" />
+
+    <!-- bottom-left -->
+    <path
+        android:fillColor="#C0F2B441"
+        android:pathData="M38,57 h8 a5,5 0 0 1 5,5 v8 a5,5 0 0 1 -5,5 h-8 a5,5 0 0 1 -5,-5 v-8 a5,5 0 0 1 5,-5 z" />
+
+    <!-- bottom-right, full amber: the perfect day -->
+    <path
+        android:fillColor="#FFF2B441"
+        android:pathData="M62,57 h8 a5,5 0 0 1 5,5 v8 a5,5 0 0 1 -5,5 h-8 a5,5 0 0 1 -5,-5 v-8 a5,5 0 0 1 5,-5 z" />
+</vector>

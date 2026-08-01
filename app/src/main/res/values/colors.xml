@@ -2,4 +2,6 @@
 <resources>
     <!-- Window background before Compose draws; matches the Tablero background. -->
     <color name="background">#FF14171C</color>
+    <!-- Adaptive launcher icon background: the same Tablero dark. -->
+    <color name="ic_launcher_background">#FF14171C</color>
 </resources>
