@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class TodayItem(
@@ -92,6 +93,16 @@ class TodayViewModel(
         viewModelScope.launch {
             repository.setCheck(item.goal.id, state.date, !item.done)
         }
+    }
+
+    /** Steps one day back; every past day is editable. */
+    fun previousDay() {
+        selectedDate.update { it.minusDays(1) }
+    }
+
+    /** Steps one day forward, never beyond today. */
+    fun nextDay() {
+        selectedDate.update { if (it < today()) it.plusDays(1) else it }
     }
 
     /** Seals the shown date. Unmarked goals stay as not done; metrics don't change. */

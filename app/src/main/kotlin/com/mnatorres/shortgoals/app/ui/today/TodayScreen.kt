@@ -19,10 +19,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -46,6 +49,7 @@ import com.mnatorres.shortgoals.app.ui.theme.OnAmber
 import com.mnatorres.shortgoals.app.ui.theme.PanelBorder
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
 import com.mnatorres.shortgoals.core.Goal
+import java.time.LocalDate
 
 @Composable
 fun TodayScreen() {
@@ -57,6 +61,8 @@ fun TodayScreen() {
         onToggle = viewModel::toggle,
         onClose = viewModel::closeDay,
         onReopen = viewModel::reopenDay,
+        onPrevious = viewModel::previousDay,
+        onNext = viewModel::nextDay,
     )
 }
 
@@ -66,9 +72,11 @@ private fun TodayContent(
     onToggle: (TodayItem) -> Unit,
     onClose: () -> Unit,
     onReopen: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        DayHeader(state)
+        DayHeader(state, onPrevious, onNext)
         Spacer(Modifier.height(16.dp))
         if (!state.hasGoals) {
             EmptyMonth(Modifier.weight(1f))
@@ -171,12 +179,41 @@ private fun ReopenButton(onReopen: () -> Unit) {
 }
 
 @Composable
-private fun DayHeader(state: TodayUiState) {
-    Text(
-        text = state.date.headerLabel(),
-        style = MaterialTheme.typography.titleLarge,
-        color = MaterialTheme.colorScheme.onBackground,
-    )
+private fun DayHeader(state: TodayUiState, onPrevious: () -> Unit, onNext: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        IconButton(onClick = onPrevious) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Día anterior",
+                tint = Amber,
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = state.date.headerLabel(),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                text = state.date.relativeLabel(LocalDate.now()),
+                style = DataSmall,
+                color = TextMuted,
+            )
+        }
+        IconButton(onClick = onNext, enabled = !state.isToday) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = "Día siguiente",
+                tint = if (state.isToday) ControlOutline else Amber,
+            )
+        }
+    }
 }
 
 @Composable
