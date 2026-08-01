@@ -3,6 +3,7 @@ package com.mnatorres.shortgoals.app.ui.today
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,11 +47,11 @@ fun TodayScreen() {
     val app = LocalContext.current.applicationContext as ShortGoalsApp
     val viewModel: TodayViewModel = viewModel { TodayViewModel(app.repository) }
     val state by viewModel.uiState.collectAsState()
-    TodayContent(state)
+    TodayContent(state, onToggle = viewModel::toggle)
 }
 
 @Composable
-private fun TodayContent(state: TodayUiState) {
+private fun TodayContent(state: TodayUiState, onToggle: (TodayItem) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         DayHeader(state)
         Spacer(Modifier.height(16.dp))
@@ -63,7 +64,9 @@ private fun TodayContent(state: TodayUiState) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(state.items, key = { it.goal.id }) { item -> GoalRow(item) }
+                items(state.items, key = { it.goal.id }) { item ->
+                    GoalRow(item, editable = state.close == null, onToggle = { onToggle(item) })
+                }
                 if (state.resting.isNotEmpty()) {
                     item { RestingCard(state.resting) }
                 }
@@ -107,12 +110,14 @@ private fun DayStats(state: TodayUiState) {
 }
 
 @Composable
-private fun GoalRow(item: TodayItem) {
+private fun GoalRow(item: TodayItem, editable: Boolean, onToggle: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, PanelBorder),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = editable, onClick = onToggle),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

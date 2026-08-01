@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class TodayItem(
     val goal: Goal,
@@ -81,6 +82,15 @@ class TodayViewModel(
             close = closes.firstOrNull { it.date == date },
             hasGoals = goals.any { !it.archived },
         )
+    }
+
+    /** Flips the mark for a goal on the shown date. No-op while the day is closed. */
+    fun toggle(item: TodayItem) {
+        val state = uiState.value
+        if (state.close != null) return
+        viewModelScope.launch {
+            repository.setCheck(item.goal.id, state.date, !item.done)
+        }
     }
 
     private companion object {
