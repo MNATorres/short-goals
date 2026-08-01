@@ -1,8 +1,8 @@
+// Android plugins are declared only in :app so that :core-only builds
+// (e.g. sandboxes without access to Google's Maven) never resolve them;
+// combine with --configure-on-demand to skip :app's configuration.
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.kotlin.compose) apply false
 }
 
 group = "com.mnatorres.shortgoals"

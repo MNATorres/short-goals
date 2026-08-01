@@ -19,7 +19,7 @@ The primary dev environment is Windows (PowerShell) with Android Studio. Use `gr
 
 ```powershell
 gradlew.bat build              # compile everything + run all tests + assemble APKs
-gradlew.bat :core:test         # run the domain unit tests only (fast, no Android SDK needed)
+gradlew.bat :core:test --configure-on-demand  # domain unit tests only (fast; skips :app, so no Android SDK/Google Maven needed)
 gradlew.bat :app:assembleDebug # build the debug APK
 gradlew.bat :app:installDebug  # install on a connected device/emulator
 ```
