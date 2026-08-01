@@ -1,6 +1,19 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kover)
+}
+
+kover {
+    reports {
+        verify {
+            rule {
+                // The domain module is where silent breakage hides; keep it
+                // thoroughly tested. koverVerify fails below this line rate.
+                minBound(85)
+            }
+        }
+    }
 }
 
 detekt {
