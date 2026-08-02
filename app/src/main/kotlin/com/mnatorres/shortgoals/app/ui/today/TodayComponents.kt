@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.mnatorres.shortgoals.app.ui.format.closedAtLabel
+import com.mnatorres.shortgoals.app.ui.format.shortLabel
 import com.mnatorres.shortgoals.app.ui.theme.Amber
 import com.mnatorres.shortgoals.app.ui.theme.ControlOutline
 import com.mnatorres.shortgoals.app.ui.theme.DataLarge

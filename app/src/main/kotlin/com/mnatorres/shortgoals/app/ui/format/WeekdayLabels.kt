@@ -1,4 +1,4 @@
-package com.mnatorres.shortgoals.app.ui.today
+package com.mnatorres.shortgoals.app.ui.format
 
 import java.time.DayOfWeek
 

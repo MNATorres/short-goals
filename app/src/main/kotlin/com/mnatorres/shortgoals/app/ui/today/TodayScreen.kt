@@ -28,6 +28,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mnatorres.shortgoals.app.ShortGoalsApp
+import com.mnatorres.shortgoals.app.ui.format.headerLabel
+import com.mnatorres.shortgoals.app.ui.format.relativeLabel
 import com.mnatorres.shortgoals.app.ui.theme.Amber
 import com.mnatorres.shortgoals.app.ui.theme.ControlOutline
 import com.mnatorres.shortgoals.app.ui.theme.DataSmall
