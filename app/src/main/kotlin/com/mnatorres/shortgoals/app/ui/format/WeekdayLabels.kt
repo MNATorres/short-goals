@@ -12,14 +12,19 @@ private val INITIALS = mapOf(
     DayOfWeek.SUNDAY to "D",
 )
 
-private val MON_TO_FRI = setOf(
+/** The two schedule presets offered by the goal editor. */
+val EVERY_DAY: Set<DayOfWeek> = DayOfWeek.entries.toSet()
+val MON_TO_FRI: Set<DayOfWeek> = setOf(
     DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
     DayOfWeek.THURSDAY, DayOfWeek.FRIDAY,
 )
 
+/** Single-letter Spanish initial: L M X J V S D. */
+fun DayOfWeek.initial(): String = INITIALS.getValue(this)
+
 /** "Todos los días", "L–V", or initials like "L X V". */
 fun Set<DayOfWeek>.shortLabel(): String = when {
-    size == DayOfWeek.entries.size -> "Todos los días"
+    this == EVERY_DAY -> "Todos los días"
     this == MON_TO_FRI -> "L–V"
     else -> sortedBy { it.value }.joinToString(" ") { INITIALS.getValue(it) }
 }

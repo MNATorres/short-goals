@@ -1,6 +1,7 @@
 package com.mnatorres.shortgoals.app.ui.goals
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,14 +19,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mnatorres.shortgoals.app.ShortGoalsApp
 import com.mnatorres.shortgoals.app.ui.format.monthLabel
 import com.mnatorres.shortgoals.app.ui.format.shortLabel
+import com.mnatorres.shortgoals.app.ui.theme.ControlOutline
 import com.mnatorres.shortgoals.app.ui.theme.DataSmall
 import com.mnatorres.shortgoals.app.ui.theme.LabelStyle
 import com.mnatorres.shortgoals.app.ui.theme.PanelBorder
@@ -37,11 +43,24 @@ fun GoalsScreen() {
     val app = LocalContext.current.applicationContext as ShortGoalsApp
     val viewModel: GoalsViewModel = viewModel { GoalsViewModel(app.repository) }
     val state by viewModel.uiState.collectAsState()
-    GoalsList(state)
+    var showEditor by remember { mutableStateOf(false) }
+
+    if (showEditor) {
+        GoalEditor(
+            goal = null,
+            onSave = { name, weekdays ->
+                viewModel.addGoal(name, weekdays)
+                showEditor = false
+            },
+            onDismiss = { showEditor = false },
+        )
+    } else {
+        GoalsList(state, onAdd = { showEditor = true })
+    }
 }
 
 @Composable
-private fun GoalsList(state: GoalsUiState) {
+private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(
             text = "Objetivos",
@@ -59,6 +78,7 @@ private fun GoalsList(state: GoalsUiState) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(state.active, key = { it.id }) { goal -> GoalCard(goal) }
+            item { AddGoalButton(onAdd) }
             if (state.archived.isNotEmpty()) {
                 item {
                     Text(
@@ -71,6 +91,26 @@ private fun GoalsList(state: GoalsUiState) {
                 items(state.archived, key = { it.id }) { goal -> GoalCard(goal, muted = true) }
             }
         }
+    }
+}
+
+@Composable
+private fun AddGoalButton(onAdd: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.background,
+        border = BorderStroke(1.dp, ControlOutline),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onAdd),
+    ) {
+        Text(
+            text = "+ Nuevo objetivo",
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextMuted,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = 12.dp),
+        )
     }
 }
 

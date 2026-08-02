@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnatorres.shortgoals.app.data.GoalsRepository
 import com.mnatorres.shortgoals.core.Goal
+import java.time.DayOfWeek
 import java.time.YearMonth
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class GoalsUiState(
     val month: YearMonth,
@@ -34,6 +36,13 @@ class GoalsViewModel(
             SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
             GoalsUiState(month),
         )
+
+    /** Creates a goal for this month. Silently ignores invalid input. */
+    fun addGoal(name: String, weekdays: Set<DayOfWeek>) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty() || weekdays.isEmpty()) return
+        viewModelScope.launch { repository.addGoal(trimmed, month, weekdays) }
+    }
 
     private companion object {
         const val STOP_TIMEOUT_MS = 5_000L
