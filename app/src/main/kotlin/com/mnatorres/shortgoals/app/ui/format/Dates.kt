@@ -2,6 +2,7 @@ package com.mnatorres.shortgoals.app.ui.format
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
@@ -10,6 +11,7 @@ import java.util.Locale
 private val SPANISH: Locale = Locale.forLanguageTag("es")
 private val DAY_OF_MONTH = DateTimeFormatter.ofPattern("d 'de' MMMM", SPANISH)
 private val CLOSED_AT = DateTimeFormatter.ofPattern("'el' dd/MM 'a las' HH:mm", SPANISH)
+private val MONTH = DateTimeFormatter.ofPattern("MMMM yyyy", SPANISH)
 
 /** "Miércoles 29 de julio" */
 fun LocalDate.headerLabel(): String {
@@ -28,3 +30,7 @@ fun LocalDate.relativeLabel(today: LocalDate): String =
 
 /** "el 22/07 a las 23:10" */
 fun LocalDateTime.closedAtLabel(): String = format(CLOSED_AT)
+
+/** "Julio 2026" */
+fun YearMonth.monthLabel(): String =
+    format(MONTH).replaceFirstChar { it.titlecase(SPANISH) }

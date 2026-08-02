@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.mnatorres.shortgoals.app.ui.goals.GoalsScreen
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
 import com.mnatorres.shortgoals.app.ui.today.TodayScreen
 
@@ -49,7 +50,7 @@ fun AppShell() {
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (selected) {
                 Tab.Today -> TodayScreen()
-                Tab.Goals -> PlaceholderScreen("Objetivos", Modifier.align(Alignment.Center))
+                Tab.Goals -> GoalsScreen()
                 Tab.Progress -> PlaceholderScreen("Progreso", Modifier.align(Alignment.Center))
             }
         }
