@@ -44,6 +44,20 @@ class GoalsViewModel(
         viewModelScope.launch { repository.addGoal(trimmed, month, weekdays) }
     }
 
+    /** Renames and/or reschedules a goal. Silently ignores invalid input. */
+    fun updateGoal(goal: Goal, name: String, weekdays: Set<DayOfWeek>) {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty() || weekdays.isEmpty()) return
+        viewModelScope.launch {
+            repository.updateGoal(goal.copy(name = trimmed, weekdays = weekdays))
+        }
+    }
+
+    /** Archives instead of deleting so past checks keep their meaning. */
+    fun archive(goal: Goal) {
+        viewModelScope.launch { repository.archiveGoal(goal) }
+    }
+
     private companion object {
         const val STOP_TIMEOUT_MS = 5_000L
     }

@@ -43,24 +43,38 @@ fun GoalsScreen() {
     val app = LocalContext.current.applicationContext as ShortGoalsApp
     val viewModel: GoalsViewModel = viewModel { GoalsViewModel(app.repository) }
     val state by viewModel.uiState.collectAsState()
-    var showEditor by remember { mutableStateOf(false) }
+    var editing by remember { mutableStateOf<GoalEditing?>(null) }
 
-    if (showEditor) {
-        GoalEditor(
-            goal = null,
-            onSave = { name, weekdays ->
-                viewModel.addGoal(name, weekdays)
-                showEditor = false
-            },
-            onDismiss = { showEditor = false },
+    when (val current = editing) {
+        null -> GoalsList(
+            state = state,
+            onAdd = { editing = GoalEditing() },
+            onEdit = { goal -> editing = GoalEditing(goal) },
         )
-    } else {
-        GoalsList(state, onAdd = { showEditor = true })
+        else -> GoalEditor(
+            goal = current.goal,
+            onSave = { name, weekdays ->
+                val goal = current.goal
+                if (goal == null) viewModel.addGoal(name, weekdays)
+                else viewModel.updateGoal(goal, name, weekdays)
+                editing = null
+            },
+            onDismiss = { editing = null },
+            onArchive = current.goal?.let { goal ->
+                {
+                    viewModel.archive(goal)
+                    editing = null
+                }
+            },
+        )
     }
 }
 
+/** Editor target: an existing goal to edit, or null for a new one. */
+private data class GoalEditing(val goal: Goal? = null)
+
 @Composable
-private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit) {
+private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit, onEdit: (Goal) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(
             text = "Objetivos",
@@ -77,7 +91,9 @@ private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit) {
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(state.active, key = { it.id }) { goal -> GoalCard(goal) }
+            items(state.active, key = { it.id }) { goal ->
+                GoalCard(goal, onClick = { onEdit(goal) })
+            }
             item { AddGoalButton(onAdd) }
             if (state.archived.isNotEmpty()) {
                 item {
@@ -115,12 +131,14 @@ private fun AddGoalButton(onAdd: () -> Unit) {
 }
 
 @Composable
-private fun GoalCard(goal: Goal, muted: Boolean = false) {
+private fun GoalCard(goal: Goal, muted: Boolean = false, onClick: (() -> Unit)? = null) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, PanelBorder),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .let { if (onClick != null) it.clickable(onClick = onClick) else it },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

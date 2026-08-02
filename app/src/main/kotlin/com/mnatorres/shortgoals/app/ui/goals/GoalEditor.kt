@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,6 +47,7 @@ internal fun GoalEditor(
     goal: Goal?,
     onSave: (String, Set<DayOfWeek>) -> Unit,
     onDismiss: () -> Unit,
+    onArchive: (() -> Unit)? = null,
 ) {
     var name by remember { mutableStateOf(goal?.name.orEmpty()) }
     var weekdays by remember { mutableStateOf(goal?.weekdays ?: EVERY_DAY) }
@@ -81,6 +83,16 @@ internal fun GoalEditor(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Guardar objetivo")
+        }
+        if (onArchive != null) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onArchive,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Archivar objetivo", color = TextMuted)
+            }
         }
         Spacer(Modifier.height(4.dp))
         TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
