@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -53,11 +55,28 @@ private fun ProgressContent(state: ProgressUiState, onOpenDay: (LocalDate) -> Un
         if (!state.hasGoals) {
             EmptyProgress(Modifier.weight(1f))
         } else {
-            MonthPanels(state)
-            Spacer(Modifier.height(12.dp))
-            MonthHeatmap(state.heatmap, onOpenDay)
-            Spacer(Modifier.height(6.dp))
-            HeatmapHint()
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                item { MonthPanels(state) }
+                item {
+                    Column {
+                        MonthHeatmap(state.heatmap, onOpenDay)
+                        Spacer(Modifier.height(6.dp))
+                        HeatmapHint()
+                    }
+                }
+                item {
+                    Text(
+                        text = "POR OBJETIVO",
+                        style = LabelStyle,
+                        color = TextMuted,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+                items(state.goals, key = { it.goal.id }) { stat -> GoalStatRow(stat) }
+            }
         }
     }
 }

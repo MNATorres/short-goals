@@ -11,17 +11,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mnatorres.shortgoals.app.ui.theme.Amber
+import com.mnatorres.shortgoals.app.ui.theme.ControlOutline
+import com.mnatorres.shortgoals.app.ui.theme.DataSmall
 import com.mnatorres.shortgoals.app.ui.theme.PanelBorder
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
 import com.mnatorres.shortgoals.core.HeatCell
@@ -93,4 +99,60 @@ internal fun HeatmapHint() {
         style = MaterialTheme.typography.bodySmall,
         color = TextMuted,
     )
+}
+
+@Composable
+internal fun GoalStatRow(stat: GoalProgress) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, PanelBorder),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stat.goal.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = "racha ×${stat.streak} · ${stat.done}/${stat.scheduled}",
+                    style = DataSmall,
+                    color = TextMuted,
+                )
+            }
+            Sparkline(stat.spark)
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = "${stat.rate}%",
+                style = DataSmall,
+                color = Amber,
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(38.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun Sparkline(spark: List<Boolean>) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.Bottom,
+        modifier = Modifier.height(16.dp),
+    ) {
+        spark.forEach { done ->
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(if (done) 16.dp else 6.dp)
+                    .clip(RoundedCornerShape(1.dp))
+                    .background(if (done) Amber else ControlOutline),
+            )
+        }
+    }
 }
