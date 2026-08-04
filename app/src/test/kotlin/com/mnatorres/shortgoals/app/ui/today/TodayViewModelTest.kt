@@ -127,6 +127,19 @@ class TodayViewModelTest {
     }
 
     @Test
+    fun `goTo jumps to a past day and clamps the future to today`() = runTest {
+        seedGoals()
+        val vm = viewModel()
+        vm.uiState.first { it.hasGoals }
+
+        vm.goTo(july.atDay(4))
+        assertEquals(july.atDay(4), vm.uiState.first { it.date != today }.date)
+
+        vm.goTo(july.atDay(31))
+        assertEquals(today, vm.uiState.first { it.date == today }.date)
+    }
+
+    @Test
     fun `a month without goals reports the empty state`() = runTest {
         val state = viewModel().uiState.first { it.date == today }
         assertFalse(state.hasGoals)
