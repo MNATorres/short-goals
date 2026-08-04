@@ -15,9 +15,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.mnatorres.shortgoals.app.ui.goals.GoalsScreen
+import com.mnatorres.shortgoals.app.ui.progress.ProgressScreen
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
 import com.mnatorres.shortgoals.app.ui.today.TodayScreen
 
@@ -51,18 +51,9 @@ fun AppShell() {
             when (selected) {
                 Tab.Today -> TodayScreen()
                 Tab.Goals -> GoalsScreen()
-                Tab.Progress -> PlaceholderScreen("Progreso", Modifier.align(Alignment.Center))
+                Tab.Progress -> ProgressScreen()
             }
         }
     }
 }
 
-@Composable
-private fun PlaceholderScreen(title: String, modifier: Modifier = Modifier) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.headlineSmall,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier,
-    )
-}
