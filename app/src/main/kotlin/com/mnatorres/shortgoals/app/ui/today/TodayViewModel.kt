@@ -95,6 +95,12 @@ class TodayViewModel(
         }
     }
 
+    /** Jumps straight to [date] (e.g. from a heatmap cell); the future clamps to today. */
+    fun goTo(date: LocalDate) {
+        val limit = today()
+        selectedDate.value = if (date > limit) limit else date
+    }
+
     /** Steps one day back; every past day is editable. */
     fun previousDay() {
         selectedDate.update { it.minusDays(1) }

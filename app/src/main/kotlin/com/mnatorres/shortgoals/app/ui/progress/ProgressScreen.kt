@@ -30,17 +30,18 @@ import com.mnatorres.shortgoals.app.ui.theme.DataSmall
 import com.mnatorres.shortgoals.app.ui.theme.LabelStyle
 import com.mnatorres.shortgoals.app.ui.theme.PanelBorder
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
+import java.time.LocalDate
 
 @Composable
-fun ProgressScreen() {
+fun ProgressScreen(onOpenDay: (LocalDate) -> Unit) {
     val app = LocalContext.current.applicationContext as ShortGoalsApp
     val viewModel: ProgressViewModel = viewModel { ProgressViewModel(app.repository) }
     val state by viewModel.uiState.collectAsState()
-    ProgressContent(state)
+    ProgressContent(state, onOpenDay)
 }
 
 @Composable
-private fun ProgressContent(state: ProgressUiState) {
+private fun ProgressContent(state: ProgressUiState, onOpenDay: (LocalDate) -> Unit) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(
             text = "Progreso",
@@ -53,6 +54,10 @@ private fun ProgressContent(state: ProgressUiState) {
             EmptyProgress(Modifier.weight(1f))
         } else {
             MonthPanels(state)
+            Spacer(Modifier.height(12.dp))
+            MonthHeatmap(state.heatmap, onOpenDay)
+            Spacer(Modifier.height(6.dp))
+            HeatmapHint()
         }
     }
 }

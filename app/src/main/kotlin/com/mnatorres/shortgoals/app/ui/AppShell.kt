@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -20,10 +21,12 @@ import com.mnatorres.shortgoals.app.ui.goals.GoalsScreen
 import com.mnatorres.shortgoals.app.ui.progress.ProgressScreen
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
 import com.mnatorres.shortgoals.app.ui.today.TodayScreen
+import java.time.LocalDate
 
 @Composable
 fun AppShell() {
     var selected by rememberSaveable { mutableStateOf(Tab.Today) }
+    var requestedDate by remember { mutableStateOf<LocalDate?>(null) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -49,9 +52,17 @@ fun AppShell() {
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when (selected) {
-                Tab.Today -> TodayScreen()
+                Tab.Today -> TodayScreen(
+                    requestedDate = requestedDate,
+                    onRequestConsumed = { requestedDate = null },
+                )
                 Tab.Goals -> GoalsScreen()
-                Tab.Progress -> ProgressScreen()
+                Tab.Progress -> ProgressScreen(
+                    onOpenDay = { date ->
+                        requestedDate = date
+                        selected = Tab.Today
+                    },
+                )
             }
         }
     }

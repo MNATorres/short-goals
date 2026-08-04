@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,10 +38,16 @@ import com.mnatorres.shortgoals.app.ui.theme.TextMuted
 import java.time.LocalDate
 
 @Composable
-fun TodayScreen() {
+fun TodayScreen(requestedDate: LocalDate? = null, onRequestConsumed: () -> Unit = {}) {
     val app = LocalContext.current.applicationContext as ShortGoalsApp
     val viewModel: TodayViewModel = viewModel { TodayViewModel(app.repository) }
     val state by viewModel.uiState.collectAsState()
+    LaunchedEffect(requestedDate) {
+        if (requestedDate != null) {
+            viewModel.goTo(requestedDate)
+            onRequestConsumed()
+        }
+    }
     TodayContent(
         state = state,
         onToggle = viewModel::toggle,

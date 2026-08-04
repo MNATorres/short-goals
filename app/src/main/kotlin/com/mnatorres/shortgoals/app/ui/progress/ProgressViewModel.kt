@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnatorres.shortgoals.app.data.GoalsRepository
 import com.mnatorres.shortgoals.core.DailyCheck
+import com.mnatorres.shortgoals.core.DayClose
 import com.mnatorres.shortgoals.core.Goal
+import com.mnatorres.shortgoals.core.HeatCell
+import com.mnatorres.shortgoals.core.monthHeatmap
 import com.mnatorres.shortgoals.core.monthMetrics
 import java.time.LocalDate
 import java.time.YearMonth
@@ -19,6 +22,7 @@ data class ProgressUiState(
     val scheduled: Int = 0,
     val rate: Int = 0,
     val perfectDays: Int = 0,
+    val heatmap: List<HeatCell> = emptyList(),
     val hasGoals: Boolean = false,
 )
 
@@ -32,7 +36,8 @@ class ProgressViewModel(
     val uiState: StateFlow<ProgressUiState> = combine(
         repository.goals(month),
         repository.checks(month),
-    ) { goals, checks -> buildState(goals, checks) }
+        repository.closes(month),
+    ) { goals, checks, closes -> buildState(goals, checks, closes) }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -42,14 +47,17 @@ class ProgressViewModel(
     private fun buildState(
         goals: List<Goal>,
         checks: List<DailyCheck>,
+        closes: List<DayClose>,
     ): ProgressUiState {
-        val metrics = monthMetrics(goals, checks, month, today())
+        val asOf = today()
+        val metrics = monthMetrics(goals, checks, month, asOf)
         return ProgressUiState(
             month = month,
             done = metrics.done,
             scheduled = metrics.scheduled,
             rate = metrics.rate,
             perfectDays = metrics.perfectDays,
+            heatmap = monthHeatmap(goals, checks, closes, month, asOf),
             hasGoals = goals.any { !it.archived },
         )
     }
