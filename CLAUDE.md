@@ -41,4 +41,4 @@ gradlew.bat :core:test --tests "com.mnatorres.shortgoals.SetupTest"
 - Tests use `kotlin.test` on the JUnit Platform (`useJUnitPlatform()`).
 - Commits: atomic (one logical change, project compiles and tests pass at every commit), English, imperative subject ≤ 72 chars, body explains the why; tests land in the same commit as the code they cover. Full conventions in `docs/IMPLEMENTATION_PLAN.md`.
 - UI copy is Spanish (the app's user language); code, comments and commits are English.
-- There is no lint/formatter configured yet.
+- Quality gates run in every build (and CI): detekt (config in `config/detekt/detekt.yml`), Kotlin compiler warnings as errors, Android Lint, and a Kover coverage floor of 85% on `:core` (`:core:koverVerify`). CI uploads installable debug/release APKs as artifacts on every push.

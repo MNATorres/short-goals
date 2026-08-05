@@ -1,6 +1,10 @@
 # Short Goals — Phase 1 Implementation Plan (Android app)
 
-Status: approved design, pre-implementation.
+Status: **implemented** — milestones M0 through M6 are done and merged;
+the app covers this whole document. Phase 2 (the small Ktor sync backend
+reusing `:core` in this repo) remains future work. Since the original
+plan, CI also gained detekt static analysis, compiler warnings as
+errors, a Kover coverage gate on `:core`, and APK artifacts per build.
 Design reference: "Tablero" direction (permanent dark mode, amber accent,
 month heatmap, monospaced numerals) — approved in the design analysis.
 
