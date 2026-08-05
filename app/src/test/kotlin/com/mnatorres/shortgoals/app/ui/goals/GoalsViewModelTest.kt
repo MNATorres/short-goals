@@ -81,6 +81,40 @@ class GoalsViewModelTest {
     }
 
     @Test
+    fun `a fresh month offers to repeat last month's active goals`() = runTest {
+        val repo = GoalsRepository(db)
+        val june = july.minusMonths(1)
+        repo.addGoal("No fumar", june, monWedFri)
+        val archivedId = repo.addGoal("Abandonado", june, monWedFri)
+        repo.archiveGoal(repo.goals(june).first().single { it.id == archivedId })
+
+        val offered = vm.uiState.first { it.previousMonthGoals.isNotEmpty() }
+        assertTrue(offered.showRepeatOffer)
+        assertEquals(listOf("No fumar"), offered.previousMonthGoals.map { it.name })
+
+        vm.repeatPreviousMonth()
+
+        val copied = vm.uiState.first { it.active.isNotEmpty() }
+        assertEquals("No fumar", copied.active.single().name)
+        assertEquals(july, copied.active.single().month)
+        assertEquals(monWedFri, copied.active.single().weekdays)
+        assertTrue(!copied.showRepeatOffer)
+    }
+
+    @Test
+    fun `repeat is a no-op once the month has goals`() = runTest {
+        val repo = GoalsRepository(db)
+        repo.addGoal("Viejo", july.minusMonths(1), monWedFri)
+        vm.addGoal("Nuevo", monWedFri)
+        vm.uiState.first { it.active.isNotEmpty() && it.previousMonthGoals.isNotEmpty() }
+
+        vm.repeatPreviousMonth()
+
+        val state = vm.uiState.first { it.active.isNotEmpty() }
+        assertEquals(listOf("Nuevo"), state.active.map { it.name })
+    }
+
+    @Test
     fun `archiving moves the goal out of the active list`() = runTest {
         vm.addGoal("No fumar", monWedFri)
         val goal = vm.uiState.first { it.active.isNotEmpty() }.active.single()

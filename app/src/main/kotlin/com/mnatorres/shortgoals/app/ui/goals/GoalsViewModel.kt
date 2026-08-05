@@ -8,7 +8,7 @@ import java.time.DayOfWeek
 import java.time.YearMonth
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -16,26 +16,50 @@ data class GoalsUiState(
     val month: YearMonth,
     val active: List<Goal> = emptyList(),
     val archived: List<Goal> = emptyList(),
-)
+    val previousMonthGoals: List<Goal> = emptyList(),
+) {
+    /** A fresh month with nothing loaded yet, but last month had goals. */
+    val showRepeatOffer: Boolean
+        get() = active.isEmpty() && previousMonthGoals.isNotEmpty()
+}
 
 class GoalsViewModel(
     private val repository: GoalsRepository,
     private val month: YearMonth = YearMonth.now(),
 ) : ViewModel() {
 
-    val uiState: StateFlow<GoalsUiState> = repository.goals(month)
-        .map { goals ->
-            GoalsUiState(
-                month = month,
-                active = goals.filter { !it.archived },
-                archived = goals.filter { it.archived },
-            )
-        }
+    private val previousMonth = month.minusMonths(1)
+
+    val uiState: StateFlow<GoalsUiState> = combine(
+        repository.goals(month),
+        repository.goals(previousMonth),
+    ) { current, previous ->
+        GoalsUiState(
+            month = month,
+            active = current.filter { !it.archived },
+            archived = current.filter { it.archived },
+            previousMonthGoals = previous.filter { !it.archived },
+        )
+    }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
             GoalsUiState(month),
         )
+
+    /**
+     * Copies last month's active goals into this month with fresh checks
+     * and streaks. Only offered while this month is still empty.
+     */
+    fun repeatPreviousMonth() {
+        val state = uiState.value
+        if (state.active.isNotEmpty() || state.previousMonthGoals.isEmpty()) return
+        viewModelScope.launch {
+            state.previousMonthGoals.forEach { goal ->
+                repository.addGoal(goal.name, month, goal.weekdays)
+            }
+        }
+    }
 
     /** Creates a goal for this month. Silently ignores invalid input. */
     fun addGoal(name: String, weekdays: Set<DayOfWeek>) {

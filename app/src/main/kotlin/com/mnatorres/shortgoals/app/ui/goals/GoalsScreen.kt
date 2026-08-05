@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,8 +33,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mnatorres.shortgoals.app.ShortGoalsApp
 import com.mnatorres.shortgoals.app.ui.format.monthLabel
 import com.mnatorres.shortgoals.app.ui.format.shortLabel
+import com.mnatorres.shortgoals.app.ui.theme.Amber
 import com.mnatorres.shortgoals.app.ui.theme.ControlOutline
 import com.mnatorres.shortgoals.app.ui.theme.DataSmall
+import com.mnatorres.shortgoals.app.ui.theme.OnAmber
 import com.mnatorres.shortgoals.app.ui.theme.LabelStyle
 import com.mnatorres.shortgoals.app.ui.theme.PanelBorder
 import com.mnatorres.shortgoals.app.ui.theme.TextMuted
@@ -50,6 +54,7 @@ fun GoalsScreen() {
             state = state,
             onAdd = { editing = GoalEditing() },
             onEdit = { goal -> editing = GoalEditing(goal) },
+            onRepeat = viewModel::repeatPreviousMonth,
         )
         else -> GoalEditor(
             goal = current.goal,
@@ -74,7 +79,12 @@ fun GoalsScreen() {
 private data class GoalEditing(val goal: Goal? = null)
 
 @Composable
-private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit, onEdit: (Goal) -> Unit) {
+private fun GoalsList(
+    state: GoalsUiState,
+    onAdd: () -> Unit,
+    onEdit: (Goal) -> Unit,
+    onRepeat: () -> Unit,
+) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(
             text = "Objetivos",
@@ -91,6 +101,9 @@ private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit, onEdit: (Goal) -> 
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            if (state.showRepeatOffer) {
+                item { RepeatOfferCard(state, onRepeat) }
+            }
             items(state.active, key = { it.id }) { goal ->
                 GoalCard(goal, onClick = { onEdit(goal) })
             }
@@ -105,6 +118,43 @@ private fun GoalsList(state: GoalsUiState, onAdd: () -> Unit, onEdit: (Goal) -> 
                     )
                 }
                 items(state.archived, key = { it.id }) { goal -> GoalCard(goal, muted = true) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RepeatOfferCard(state: GoalsUiState, onRepeat: () -> Unit) {
+    val previousMonth = state.month.minusMonths(1)
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, PanelBorder),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                text = "Mes nuevo, pizarra limpia",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = "Tenías ${state.previousMonthGoals.size} objetivos en " +
+                    previousMonth.monthLabel(),
+                style = MaterialTheme.typography.bodySmall,
+                color = TextMuted,
+            )
+            Spacer(Modifier.height(10.dp))
+            Button(
+                onClick = onRepeat,
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Amber,
+                    contentColor = OnAmber,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Repetir esos objetivos")
             }
         }
     }
