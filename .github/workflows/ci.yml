@@ -31,11 +31,16 @@ jobs:
       # coverage floor. GitHub's ubuntu runners ship with the Android SDK.
       - run: ./gradlew build :core:koverVerify
 
-      # The installable debug APK, downloadable from each run's Artifacts.
+      # Installable APKs, downloadable from each run's Artifacts.
       - uses: actions/upload-artifact@v4
         with:
           name: short-goals-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: short-goals-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
 
       # On failure, keep every test/lint/detekt report for diagnosis.
       - if: failure()

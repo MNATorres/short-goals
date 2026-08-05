@@ -19,13 +19,17 @@ android {
         applicationId = "com.mnatorres.shortgoals"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "1.0.0"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            // Personal app installed straight from CI artifacts: signing with
+            // the debug keystore keeps the release APK installable without a
+            // store. Revisit if the app is ever distributed.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
